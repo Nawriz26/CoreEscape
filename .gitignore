@@ -67,3 +67,6 @@ desktop.ini
 
 # Visual Studio generated solution files
 *.slnx
+
+# Visual Studio Code settings
+.vscode/
