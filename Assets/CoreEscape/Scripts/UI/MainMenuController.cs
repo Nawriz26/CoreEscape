@@ -21,6 +21,8 @@ public class MainMenuController : MonoBehaviour
 {
     private const ushort GamePort = 7777;
 
+    private bool levelLoadStarted;
+
     [Header("LAN Menu")]
     [SerializeField] private GameObject networkPanel;
     [SerializeField] private TMP_InputField ipAddressInput;
@@ -66,6 +68,8 @@ public class MainMenuController : MonoBehaviour
 
     public void StartHostGame()
     {
+        levelLoadStarted = false;
+
         UnityTransport transport =
             NetworkManager.Singleton.GetComponent<UnityTransport>();
 
@@ -124,24 +128,41 @@ public class MainMenuController : MonoBehaviour
 #endif
     }
 
-    private void OnClientConnected(ulong clientId)
+   private void OnClientConnected(ulong clientId)
+{
+    if (NetworkManager.Singleton.IsHost)
     {
-        if (NetworkManager.Singleton.IsHost)
+        if (clientId ==
+            NetworkManager.Singleton.LocalClientId)
         {
-            if (clientId == NetworkManager.Singleton.LocalClientId)
-            {
-                SetStatus("Host started. Waiting for Player 2...");
-            }
-            else
-            {
-                SetStatus("Player 2 connected!");
-            }
+            SetStatus(
+                "Host started. Waiting for Player 2..."
+            );
         }
         else
         {
-            SetStatus("Connected successfully!");
+            SetStatus(
+                "Player 2 connected! Loading Level 1..."
+            );
+
+            if (!levelLoadStarted &&
+                NetworkManager.Singleton
+                    .ConnectedClients.Count >= 2)
+            {
+                levelLoadStarted = true;
+
+                NetworkManager.Singleton.SceneManager.LoadScene(
+                    "Level01_Warehouse",
+                    LoadSceneMode.Single
+                );
+            }
         }
     }
+    else
+    {
+        SetStatus("Connected successfully!");
+    }
+}
 
     private void OnClientDisconnected(ulong clientId)
     {
