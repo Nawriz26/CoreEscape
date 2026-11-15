@@ -7,8 +7,8 @@
 ** Professor         : Diogo Fernandes de Queiroz
 ** Final Project     : Core Escape
 ** Date              : November 15, 2026
-** Description       : Moves a server-controlled projectile and
-**                     despawns it after a collision or time limit.
+** Description       : Moves a server-controlled projectile, applies
+**                     damage, and despawns after impact or timeout.
 **
 */
 
@@ -21,13 +21,20 @@ public class NetworkProjectile : NetworkBehaviour
     [Header("Projectile Settings")]
     [SerializeField] private float speed = 18.0f;
     [SerializeField] private float lifetime = 3.0f;
+    [SerializeField] private int damage = 25;
 
     private Rigidbody projectileRigidbody;
     private float despawnTime;
+    private ulong shooterClientId = ulong.MaxValue;
 
     private void Awake()
     {
         projectileRigidbody = GetComponent<Rigidbody>();
+    }
+
+    public void Initialize(ulong clientId)
+    {
+        shooterClientId = clientId;
     }
 
     public override void OnNetworkSpawn()
@@ -59,18 +66,31 @@ public class NetworkProjectile : NetworkBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (IsServer && IsSpawned)
-        {
-            DespawnProjectile();
-        }
+        HandleHit(collision.collider);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (IsServer && IsSpawned)
+        HandleHit(other);
+    }
+
+    private void HandleHit(Collider hitCollider)
+    {
+        if (!IsServer || !IsSpawned)
         {
-            DespawnProjectile();
+            return;
         }
+
+        NetworkPlayerHealth playerHealth =
+            hitCollider.GetComponentInParent<NetworkPlayerHealth>();
+
+        if (playerHealth != null &&
+            playerHealth.OwnerClientId != shooterClientId)
+        {
+            playerHealth.ApplyDamage(damage);
+        }
+
+        DespawnProjectile();
     }
 
     private void DespawnProjectile()

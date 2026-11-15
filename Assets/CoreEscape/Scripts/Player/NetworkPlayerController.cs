@@ -26,6 +26,7 @@ public class NetworkPlayerController : NetworkBehaviour
 
     private CharacterController characterController;
     private float verticalVelocity;
+    private bool movementEnabled = true;
 
     private void Awake()
     {
@@ -35,10 +36,10 @@ public class NetworkPlayerController : NetworkBehaviour
     private void Update()
     {
         // Only the client that owns this player can control it.
-        if (!IsSpawned || !IsOwner)
-        {
-            return;
-        }
+        if (!IsSpawned || !IsOwner || !movementEnabled)
+{
+    return;
+}
 
         Keyboard keyboard = Keyboard.current;
 
@@ -103,4 +104,14 @@ public class NetworkPlayerController : NetworkBehaviour
             velocity * Time.deltaTime
         );
     }
+
+    public void SetMovementEnabled(bool isEnabled)
+{
+    movementEnabled = isEnabled;
+
+    if (!movementEnabled)
+    {
+        verticalVelocity = 0.0f;
+    }
+}
 }

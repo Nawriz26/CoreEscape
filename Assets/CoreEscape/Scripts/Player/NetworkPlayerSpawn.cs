@@ -56,7 +56,7 @@ public class NetworkPlayerSpawn : NetworkBehaviour
         MoveToAssignedSpawnPoint();
     }
 
-    private void MoveToAssignedSpawnPoint()
+    public void MoveToAssignedSpawnPoint()
     {
         string sceneName =
             SceneManager.GetActiveScene().name;

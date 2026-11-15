@@ -78,9 +78,14 @@ public class NetworkPlayerAttack : NetworkBehaviour
                 firePoint.rotation
             );
 
-        NetworkObject projectileNetworkObject =
-            projectileInstance.GetComponent<NetworkObject>();
+        NetworkProjectile networkProjectile =
+    projectileInstance.GetComponent<NetworkProjectile>();
 
-        projectileNetworkObject.Spawn();
+networkProjectile.Initialize(OwnerClientId);
+
+NetworkObject projectileNetworkObject =
+    projectileInstance.GetComponent<NetworkObject>();
+
+projectileNetworkObject.Spawn();
     }
 }

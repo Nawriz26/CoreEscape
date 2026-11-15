@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 4110380835779031361}
   - component: {fileID: 6172577423305845494}
   - component: {fileID: 4565885731046368523}
+  - component: {fileID: 4004119688680766336}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Untagged
@@ -337,7 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2037170269
+  GlobalObjectIdHash: 210075849
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0
@@ -457,6 +458,21 @@ MonoBehaviour:
   projectilePrefab: {fileID: 5643210035349956677, guid: ff3aeba5925f8cd45870906158998465, type: 3}
   firePoint: {fileID: 4082484060143909116}
   fireCooldown: 0.4
+--- !u!114 &4004119688680766336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4009096677589717987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc4b29e7343427643a0cc2959d16c65a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkPlayerHealth
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxHealth: 100
+  respawnDelay: 2
 --- !u!1 &7759754575160331621
 GameObject:
   m_ObjectHideFlags: 0
