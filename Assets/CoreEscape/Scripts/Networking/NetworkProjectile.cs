@@ -74,24 +74,29 @@ public class NetworkProjectile : NetworkBehaviour
         HandleHit(other);
     }
 
-    private void HandleHit(Collider hitCollider)
+ private void HandleHit(Collider hitCollider)
+{
+    NetworkDamageTarget damageTarget =
+        hitCollider.GetComponentInParent<NetworkDamageTarget>();
+
+    if (damageTarget != null)
     {
-        if (!IsServer || !IsSpawned)
-        {
-            return;
-        }
-
-        NetworkPlayerHealth playerHealth =
-            hitCollider.GetComponentInParent<NetworkPlayerHealth>();
-
-        if (playerHealth != null &&
-            playerHealth.OwnerClientId != shooterClientId)
-        {
-            playerHealth.ApplyDamage(damage);
-        }
-
+        damageTarget.ApplyDamage(damage);
         DespawnProjectile();
+        return;
     }
+
+    NetworkPlayerHealth playerHealth =
+        hitCollider.GetComponentInParent<NetworkPlayerHealth>();
+
+    if (playerHealth != null &&
+        playerHealth.OwnerClientId != shooterClientId)
+    {
+        playerHealth.ApplyDamage(damage);
+    }
+
+    DespawnProjectile();
+}
 
     private void DespawnProjectile()
     {
