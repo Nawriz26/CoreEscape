@@ -71,6 +71,23 @@ public class NetworkPlayerHealth : NetworkBehaviour
         }
     }
 
+    public bool Heal(int amount)
+{
+    if (!IsServer ||
+        amount <= 0 ||
+        currentHealth.Value <= 0 ||
+        currentHealth.Value >= MaxHealth)
+    {
+        return false;
+    }
+
+    currentHealth.Value = Mathf.Min(
+        MaxHealth,
+        currentHealth.Value + amount);
+
+    return true;
+}
+
     public void ApplyDamage(int damageAmount)
     {
         if (!IsServer ||
