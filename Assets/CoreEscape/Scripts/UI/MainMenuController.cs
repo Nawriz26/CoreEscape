@@ -152,7 +152,7 @@ public class MainMenuController : MonoBehaviour
                 levelLoadStarted = true;
 
                 NetworkManager.Singleton.SceneManager.LoadScene(
-                    "Level01_Warehouse",
+                    GameProgress.GetSelectedLevelScene(),
                     LoadSceneMode.Single
                 );
             }

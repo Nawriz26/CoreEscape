@@ -53,6 +53,10 @@ public class NetworkPlayerSpawn : NetworkBehaviour
         Scene scene,
         LoadSceneMode loadSceneMode)
     {
+        if (!scene.name.StartsWith("Level"))
+{
+    return;
+}
         MoveToAssignedSpawnPoint();
     }
 
