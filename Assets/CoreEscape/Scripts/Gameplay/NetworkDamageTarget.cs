@@ -24,21 +24,34 @@ public class NetworkDamageTarget : NetworkBehaviour
     private readonly NetworkVariable<int> currentHealth =
         new NetworkVariable<int>(50);
 
+    private readonly NetworkVariable<bool> isDestroyed =
+        new NetworkVariable<bool>(false);
+
     public int CurrentHealth => currentHealth.Value;
     public int MaximumHealth => maximumHealth;
 
     public override void OnNetworkSpawn()
     {
+        isDestroyed.OnValueChanged += OnDestroyedStateChanged;
+
         if (IsServer)
         {
             currentHealth.Value = maximumHealth;
         }
+
+        ApplyDestroyedState(isDestroyed.Value);
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        isDestroyed.OnValueChanged -= OnDestroyedStateChanged;
     }
 
     public void ApplyDamage(int damage)
     {
         if (!IsServer || damage <= 0 ||
-            currentHealth.Value <= 0)
+            currentHealth.Value <= 0 ||
+            isDestroyed.Value)
         {
             return;
         }
@@ -60,6 +73,33 @@ public class NetworkDamageTarget : NetworkBehaviour
             NetworkScoreManager.Instance.AddScore(scoreValue);
         }
 
-        NetworkObject.Despawn(true);
+        isDestroyed.Value = true;
+        ApplyDestroyedState(true);
+    }
+
+    private void OnDestroyedStateChanged(
+        bool previousValue,
+        bool newValue)
+    {
+        ApplyDestroyedState(newValue);
+    }
+
+    private void ApplyDestroyedState(bool destroyed)
+    {
+        Renderer[] renderers =
+            GetComponentsInChildren<Renderer>(true);
+
+        foreach (Renderer targetRenderer in renderers)
+        {
+            targetRenderer.enabled = !destroyed;
+        }
+
+        Collider[] colliders =
+            GetComponentsInChildren<Collider>(true);
+
+        foreach (Collider targetCollider in colliders)
+        {
+            targetCollider.enabled = !destroyed;
+        }
     }
 }

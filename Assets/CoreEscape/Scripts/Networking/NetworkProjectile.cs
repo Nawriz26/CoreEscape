@@ -76,6 +76,16 @@ public class NetworkProjectile : NetworkBehaviour
 
  private void HandleHit(Collider hitCollider)
 {
+    NetworkEnemyHealth enemyHealth =
+        hitCollider.GetComponentInParent<NetworkEnemyHealth>();
+
+    if (enemyHealth != null)
+    {
+        enemyHealth.ApplyDamage(damage);
+        DespawnProjectile();
+        return;
+    }
+
     NetworkDamageTarget damageTarget =
         hitCollider.GetComponentInParent<NetworkDamageTarget>();
 
