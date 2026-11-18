@@ -145,14 +145,22 @@ public class NetworkPlayerHealth : NetworkBehaviour
     }
 
     private IEnumerator RespawnAfterDelay()
-    {
-        yield return new WaitForSeconds(respawnDelay);
+{
+    yield return new WaitForSeconds(respawnDelay);
 
-        if (IsServer && IsSpawned)
+    if (IsServer && IsSpawned)
+    {
+        bool canRespawn =
+            NetworkLevelManager.Instance == null ||
+            NetworkLevelManager.Instance
+                .TryConsumeTeamRespawn();
+
+        if (canRespawn)
         {
             currentHealth.Value = maxHealth;
         }
-
-        respawnCoroutine = null;
     }
+
+    respawnCoroutine = null;
+}
 }

@@ -6,9 +6,9 @@
 ** Course            : Game Programming 2 - COMP396 - Fall 2026
 ** Professor         : Diogo Fernandes de Queiroz
 ** Final Project     : Core Escape
-** Date              : November 16, 2026
-** Description       : Displays the local player's health and the
-**                     synchronized cooperative team score.
+** Date              : November 17, 2026
+** Description       : Displays local health, synchronized team score,
+**                     and remaining shared team respawns.
 **
 */
 
@@ -21,14 +21,17 @@ public class GameplayHUDController : MonoBehaviour
     [Header("HUD References")]
     [SerializeField] private TMP_Text healthText;
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text respawnsText;
 
     private NetworkPlayerHealth localPlayerHealth;
     private NetworkScoreManager scoreManager;
+    private NetworkLevelManager levelManager;
 
     private IEnumerator Start()
     {
         yield return BindLocalPlayerHealth();
         yield return BindScoreManager();
+        yield return BindLevelManager();
     }
 
     private IEnumerator BindLocalPlayerHealth()
@@ -75,7 +78,23 @@ public class GameplayHUDController : MonoBehaviour
         UpdateScore(scoreManager.TeamScore);
     }
 
-    private void UpdateHealth(int currentHealth, int maximumHealth)
+    private IEnumerator BindLevelManager()
+    {
+        while (NetworkLevelManager.Instance == null ||
+               !NetworkLevelManager.Instance.IsSpawned)
+        {
+            yield return null;
+        }
+
+        levelManager = NetworkLevelManager.Instance;
+        levelManager.RespawnsChanged += UpdateRespawns;
+
+        UpdateRespawns(levelManager.RemainingTeamRespawns);
+    }
+
+    private void UpdateHealth(
+        int currentHealth,
+        int maximumHealth)
     {
         healthText.text =
             $"HEALTH: {currentHealth} / {maximumHealth}";
@@ -84,6 +103,12 @@ public class GameplayHUDController : MonoBehaviour
     private void UpdateScore(int score)
     {
         scoreText.text = $"SCORE: {score}";
+    }
+
+    private void UpdateRespawns(int respawns)
+    {
+        respawnsText.text =
+            $"RESPAWNS: {respawns}";
     }
 
     private void OnDestroy()
@@ -96,6 +121,11 @@ public class GameplayHUDController : MonoBehaviour
         if (scoreManager != null)
         {
             scoreManager.ScoreChanged -= UpdateScore;
+        }
+
+        if (levelManager != null)
+        {
+            levelManager.RespawnsChanged -= UpdateRespawns;
         }
     }
 }
